@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mislaydu.coolmaweather.R;
+import com.mislaydu.coolmaweather.service.AutoUpdateService;
 import com.mislaydu.coolmaweather.util.HttpCallbackListenner;
 import com.mislaydu.coolmaweather.util.HttpUtil;
 import com.mislaydu.coolmaweather.util.Utility;
@@ -90,6 +91,10 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    /**
+     * 设置按钮监听
+     * @param v
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -189,6 +194,8 @@ public class WeatherActivity extends AppCompatActivity implements View.OnClickLi
         currentDateText.setText(preferences.getString("current_date", ""));
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
 
     }
 }
