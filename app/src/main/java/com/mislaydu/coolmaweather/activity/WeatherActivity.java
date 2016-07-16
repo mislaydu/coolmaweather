@@ -1,5 +1,6 @@
 package com.mislaydu.coolmaweather.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -7,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,7 +20,7 @@ import com.mislaydu.coolmaweather.util.Utility;
 /**
  * 显示天气概况
  */
-public class WeatherActivity extends AppCompatActivity {
+public class WeatherActivity extends AppCompatActivity implements View.OnClickListener{
     private LinearLayout weatherInfoLayout;
     /**
      * 显示城市名
@@ -44,11 +46,21 @@ public class WeatherActivity extends AppCompatActivity {
      * 用于显示当前日期
      */
     private TextView currentDateText;
+    /**
+     * 切换城市按钮
+     */
+    private Button switchCity;
+    /**
+     * 更新天气按钮
+     */
+    private Button refreshWeather;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather_layout);
+        getSupportActionBar().hide();
         /**
          * 初始化各控件
          */
@@ -59,6 +71,10 @@ public class WeatherActivity extends AppCompatActivity {
         temp1Text = (TextView) findViewById(R.id.temp1); // 显示气温1
         temp2Text = (TextView) findViewById(R.id.temp2);  // 显示气温2
         currentDateText = (TextView) findViewById(R.id.current_date); // 显示当前日期
+        switchCity = (Button) findViewById(R.id.switch_city); // 按钮,切换城市
+        refreshWeather = (Button) findViewById(R.id.refresh_weather); // 按钮,更新天气
+        switchCity.setOnClickListener(this);
+        refreshWeather.setOnClickListener(this);
         // 从ChooseAreaActivity中传过来的意图中获取县级代号
         String countyCode = getIntent().getStringExtra("county_code");
         Log.d("xyz", "选择的县级代号为: " + countyCode);
@@ -71,6 +87,27 @@ public class WeatherActivity extends AppCompatActivity {
         } else {
             // 没有县级代号时就直接显示本地天气
             showWeather(); // 显示天气信息
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.switch_city:
+                Intent intent = new Intent(this, ChooseAreaActivity.class);
+                intent.putExtra("from_weather_activity", true);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.refresh_weather:
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                String weatherCode = preferences.getString("weather_code", "");
+                if (!TextUtils.isEmpty(weatherCode)) {
+                    queryWeatherInfo(weatherCode);
+                }
+                break;
+            default:
+                break;
         }
     }
 

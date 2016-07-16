@@ -64,13 +64,18 @@ public class ChooseAreaActivity extends AppCompatActivity {
      * 当前选中的级别
      */
     private int currentLevel;
+    /**
+     * 是否从WeatherActivity中跳转过来
+     */
+    private boolean isFromWeatherActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity",false);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if(preferences.getBoolean("city_selected",false)){
-            Intent intent = new Intent(this,WeatherActivity.class);
+        if (preferences.getBoolean("city_selected", false)&&!isFromWeatherActivity) {
+            Intent intent = new Intent(this, WeatherActivity.class);
             startActivity(intent);
             finish();
             return;
@@ -90,10 +95,10 @@ public class ChooseAreaActivity extends AppCompatActivity {
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(i);
                     initCounties(); // 加载县级数据
-                }else if(currentLevel==LEVEL_COUNTY){
+                } else if (currentLevel == LEVEL_COUNTY) {
                     String countyCode = countyList.get(i).getCountyCode();
-                    Intent intent = new Intent(ChooseAreaActivity.this,WeatherActivity.class);
-                    intent.putExtra("county_code",countyCode);
+                    Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    intent.putExtra("county_code", countyCode);
                     startActivity(intent);
                     finish();
                 }
@@ -235,17 +240,20 @@ public class ChooseAreaActivity extends AppCompatActivity {
             progressDialog.dismiss(); // 关闭进度
         }
     }
+
     /**
      * 捕获Back按键,根据当前的级别来判断,此时应该返回市列表、省列表、还是直接退出
      */
     @Override
-    public void onBackPressed(){
-        if(currentLevel==LEVEL_COUNTY){
+    public void onBackPressed() {
+        if (currentLevel == LEVEL_COUNTY) {
             initCities();
-        }else if(currentLevel==LEVEL_CITY){
+        } else if (currentLevel == LEVEL_CITY) {
             initProvinces();
-        }else {
-            finish();
+        } else if (isFromWeatherActivity){
+            Intent intent = new Intent(this,WeatherActivity.class);
+            startActivity(intent);
         }
+        finish();
     }
 }
